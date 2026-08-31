@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - StickGPT</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">StickGPT</a></div>
+        <nav class="nav-links">
+            <a href="catalog.html">Catalog</a>
+            <a href="custom.html">Custom Stickers</a>
+            <a href="seller/index.html" class="login-link">Seller Login</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="checkout-section" style="max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem;">
+            <h2 style="text-align: center; margin-bottom: 2rem; font-size: 2rem;">Checkout</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
+                
+                <div style="flex: 1; min-width: 300px; background: #fff; padding: 1.5rem; border-radius: 12px; border: 2px solid #ddd; box-shadow: var(--shadow);">
+                    <h3 style="margin-bottom: 1rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block;">Order Summary</h3>
+                    <div id="checkout-cart-items" style="margin-bottom: 1.5rem;">
+                        <!-- JS populated -->
+                    </div>
+                    <div style="font-size: 1.3rem; font-weight: 800; text-align: right; color: var(--secondary-color); border-top: 1px solid #eee; padding-top: 1rem;">
+                        Total: ₹<span id="checkout-total">0</span>
+                    </div>
+                </div>
+
+                <div style="flex: 1; min-width: 300px; background: #fff; padding: 1.5rem; border-radius: 12px; border: 2px solid #ddd; box-shadow: var(--shadow);">
+                    <h3 style="margin-bottom: 1.5rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block;">Delivery Details</h3>
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label>Full Name *</label>
+                            <input type="text" id="cust-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number *</label>
+                            <input type="tel" id="cust-phone" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email (Optional)</label>
+                            <input type="email" id="cust-email" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Special Notes (Optional)</label>
+                            <textarea id="cust-notes" class="form-control" rows="2"></textarea>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <button type="submit" id="btn-confirm" class="btn btn-primary full-width" style="margin-bottom: 1rem; background-color: #2ecc71; color: white;">Confirm Order</button>
+                            
+                            <div id="wa-buttons-container" class="hidden">
+                                <h4>Choose WhatsApp Number to send order:</h4>
+                                <div style="display:flex; gap:1rem; margin-top: 1rem;">
+                                    <button type="button" id="btn-wa-1" class="btn btn-primary full-width">Send to +91 7874068891</button>
+                                    <button type="button" id="btn-wa-2" class="btn btn-secondary full-width">Send to +91 6353303572</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>
+                <h3>StickGPT</h3>
+                <p>Custom & pre-made vinyl stickers.</p>
+            </div>
+            <div>
+                <h3>Contact (WhatsApp)</h3>
+                <p>+91 7874068891</p>
+                <p>+91 6353303572</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 StickGPT. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const checkoutItems = document.getElementById('checkout-cart-items');
+            const checkoutTotal = document.getElementById('checkout-total');
+            const form = document.getElementById('checkout-form');
+            const waButtonsContainer = document.getElementById('wa-buttons-container');
+            const btnConfirm = document.getElementById('btn-confirm');
+            
+            let generatedWaMessage = "";
+
+            document.getElementById('btn-wa-1').addEventListener('click', () => {
+                const encodedMessage = encodeURIComponent(generatedWaMessage);
+                const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[0]}?text=${encodedMessage}`;
+                store.clearCart();
+                window.location.href = waUrl;
+            });
+            document.getElementById('btn-wa-2').addEventListener('click', () => {
+                const encodedMessage = encodeURIComponent(generatedWaMessage);
+                const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[1]}?text=${encodedMessage}`;
+                store.clearCart();
+                window.location.href = waUrl;
+            });
+
+            function renderSummary() {
+                const cart = store.cart;
+                if (cart.length === 0) {
+                    checkoutItems.innerHTML = '<p>Cart is empty. Please add items to cart first.</p>';
+                    document.getElementById('btn-wa-1').disabled = true;
+                    document.getElementById('btn-wa-2').disabled = true;
+                } else {
+                    checkoutItems.innerHTML = cart.map(item => `
+                        <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
+                            <div>
+                                <strong>${item.name}</strong> x${item.qty}
+                                ${item.type === 'custom' ? `<br><small>Size: ${item.size}</small>` : ''}
+                            </div>
+                            <div>₹${item.price * item.qty}</div>
+                        </div>
+                    `).join('');
+                }
+                checkoutTotal.textContent = store.getCartTotal();
+            }
+
+            renderSummary();
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (store.cart.length === 0) return;
+
+                if (!confirm("Are you sure you want to confirm this order?")) {
+                    return;
+                }
+
+                btnConfirm.classList.add('hidden');
+                waButtonsContainer.classList.remove('hidden');
+
+                const name = document.getElementById('cust-name').value;
+                const phone = document.getElementById('cust-phone').value;
+                const email = document.getElementById('cust-email').value;
+
+                const notes = document.getElementById('cust-notes').value;
+
+                const orderId = 'ORD-' + Date.now();
+                const totalAmount = store.getCartTotal();
+
+                // Format WhatsApp Message
+                let message = `*NEW STICKER ORDER*\n\n`;
+                message += `Name: ${name}\n`;
+                message += `Phone: ${phone}\n`;
+                if(email) message += `Email: ${email}\n`;
+                message += `\n`;
+                
+                message += `*Order Details:*\n`;
+                store.cart.forEach(item => {
+                    if (item.type === 'catalog') {
+                        message += `- ${item.name} (Qty: ${item.qty}) - ₹${item.price}\n`;
+                    } else {
+                        // We attach a placeholder for image link. The apps script will generate real drive links if we send it the payload.
+                        // Since WhatsApp doesn't let us attach files via URL API easily except text, we just send text.
+                        message += `- CUSTOM STICKER (Qty: ${item.qty}) - Size: ${item.size}, Notes: ${item.notes || 'None'}\n`;
+                    }
+                });
+
+                message += `\n*Total Amount: ₹${totalAmount}*\n\n`;
+                if(notes) message += `Notes: ${notes}\n\n`;
+                message += `Order ID: ${orderId}\n`;
+                message += `Date: ${new Date().toLocaleString()}`;
+
+                generatedWaMessage = message;
+
+                const payload = {
+                    action: 'placeOrder',
+                    orderId,
+                    timestamp: new Date().toISOString(),
+                    customerName: name,
+                    phone,
+                    email,
+                    notes,
+                    totalAmount,
+                    items: store.cart 
+                };
+
+                // Local Fallback for Demo
+                const existingOrders = JSON.parse(localStorage.getItem('sticker_orders')) || [];
+                existingOrders.unshift(payload);
+                try {
+                    localStorage.setItem('sticker_orders', JSON.stringify(existingOrders));
+                } catch(e) {
+                    console.warn("Storage quota exceeded, clearing old orders");
+                    localStorage.setItem('sticker_orders', JSON.stringify([payload]));
+                }
+
+                // Background send to Apps Script to save in Google Sheets
+                if (CONFIG.APPS_SCRIPT_URL) {
+                    try {
+                        // Fire and forget
+                        fetch(CONFIG.APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'no-cors', // So it works without CORS issues on simple saves
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                    } catch(err) {
+                        console.error('Failed to log order to sheets', err);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

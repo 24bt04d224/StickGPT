@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog - StickGPT</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">StickGPT</a></div>
+        <nav class="nav-links">
+            <a href="catalog.html">Catalog</a>
+            <a href="custom.html">Custom Stickers</a>
+            <a href="seller/index.html" class="login-link">Seller Login</a>
+        </nav>
+        <button id="cart-toggle" class="cart-btn">
+            Cart <span id="cart-count">0</span>
+        </button>
+    </header>
+
+    <main>
+        <section class="catalog-section">
+            <h2>Our Stickers</h2>
+            
+            <div class="controls" style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;">
+                <input type="text" id="search-input" class="form-control" placeholder="Search stickers..." style="max-width: 200px;">
+                <select id="availability-filter" class="form-control" style="max-width: 150px;">
+                    <option value="All">All Stickers</option>
+                    <option value="Available">Available</option>
+                    <option value="SoldOut">Sold Out</option>
+                </select>
+                <select id="sort-select" class="form-control" style="max-width: 150px;">
+                    <option value="newest">Newest</option>
+                    <option value="price-asc">Price: Low to High</option>
+                    <option value="price-desc">Price: High to Low</option>
+                </select>
+            </div>
+
+            <div id="catalog-grid" class="sticker-grid">
+                <p class="loading">Loading catalog...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>
+                <h3>StickGPT</h3>
+                <p>Custom & pre-made vinyl stickers.</p>
+            </div>
+            <div>
+                <h3>Contact (WhatsApp)</h3>
+                <p>+91 7874068891</p>
+                <p>+91 6353303572</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 StickGPT. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer (Hidden by default) -->
+    <div id="cart-drawer" class="cart-drawer">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button id="close-cart" class="close-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">Total: ₹<span id="cart-total-price">0</span></div>
+            <a href="checkout.html" class="btn btn-primary full-width">Proceed to Checkout</a>
+        </div>
+    </div>
+    <div id="cart-overlay" class="cart-overlay hidden"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/catalog.js"></script>
+</body>
+</html>

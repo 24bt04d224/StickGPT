@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Login - StickGPT</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body style="background-color: #f4f4f4;">
+    <div class="login-container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Seller Dashboard</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label>Email Address</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label>PIN / Password</label>
+                <input type="password" id="pin" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary full-width">Login</button>
+            <p id="error-msg" style="color: red; margin-top: 1rem; text-align: center; display: none;">Invalid credentials.</p>
+        </form>
+        <div style="text-align: center; margin-top: 1rem;">
+            <a href="../index.html">← Back to Store</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const pin = document.getElementById('pin').value.trim();
+            
+            const allowedEmails = ['hirray15@gmail.com', '24bt04d224@gsfcuniversty.ac.in'];
+            // Super basic client-side check as requested (for keeping casuals out)
+            if (allowedEmails.includes(email) && pin === '1129') { // PIN can be anything for this mockup
+                localStorage.setItem('seller_auth', 'true');
+                localStorage.setItem('seller_email', email);
+                window.location.href = 'dashboard.html';
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

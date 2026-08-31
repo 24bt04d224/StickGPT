@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - StickGPT</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script>
+        if (localStorage.getItem('seller_auth') !== 'true') {
+            window.location.href = 'index.html';
+        }
+    </script>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                StickGPT Admin
+            </div>
+            <nav class="sidebar-nav">
+                <button id="nav-orders" class="active">Orders Dashboard</button>
+                <button id="nav-catalog">Manage Catalog</button>
+                <button id="nav-stats">Stats & Analytics</button>
+                <button id="nav-logout" style="margin-top: auto;">Logout</button>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <!-- Orders View -->
+            <div id="view-orders">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Orders</h2>
+                    <button id="refresh-orders" class="btn btn-outline">Refresh Data</button>
+                </div>
+                
+                <div id="orders-container" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Loading state -->
+                    <div style="text-align: center; padding: 2rem;">Loading orders...</div>
+                </div>
+            </div>
+
+            <!-- Catalog View -->
+            <div id="view-catalog" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Manage Stickers</h2>
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="delete-selected-btn" class="btn btn-outline" style="color: #c62828; border-color: #c62828; display: none;">Delete Selected</button>
+                        <button id="add-sticker-btn" class="btn btn-primary">+ Add New Sticker(s)</button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="select-all-catalog"></th>
+                                    <th>Image</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="catalog-table-body">
+                                <tr><td colspan="6">Loading catalog...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats View -->
+            <div id="view-stats" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Stats & Analytics</h2>
+                    <button id="refresh-stats" class="btn btn-outline">Refresh Data</button>
+                </div>
+                
+                <div style="display: flex; gap: 2rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px; background: #fff; padding: 1.5rem; border-radius: 12px; border: 2px solid #ddd; text-align: center;">
+                        <h3 style="color: #555; margin-bottom: 0.5rem;">Completed Orders</h3>
+                        <p id="stat-completed" style="font-size: 2.5rem; font-weight: 800; color: #2ecc71;">0</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; background: #fff; padding: 1.5rem; border-radius: 12px; border: 2px solid #ddd; text-align: center;">
+                        <h3 style="color: #555; margin-bottom: 0.5rem;">Pending Orders</h3>
+                        <p id="stat-pending" style="font-size: 2.5rem; font-weight: 800; color: #f39c12;">0</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; background: #fff; padding: 1.5rem; border-radius: 12px; border: 2px solid #ddd; text-align: center;">
+                        <h3 style="color: #555; margin-bottom: 0.5rem;">Revenue</h3>
+                        <p id="stat-revenue" style="font-size: 2.5rem; font-weight: 800; color: var(--primary-color);">₹0</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 3rem;">
+                    <h3 style="margin-bottom: 1rem; color: #c62828;">Sold Out Stickers</h3>
+                    <div class="card">
+                        <ul id="low-stock-list" style="list-style: none; padding: 0;">
+                            <!-- Populated dynamically -->
+                            <li>Loading...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sticker Modal -->
+    <div id="sticker-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal" id="close-sticker-modal">&times;</button>
+            <h3 id="modal-title">Add/Edit Sticker</h3>
+            <form id="sticker-form" style="margin-top: 1rem;">
+                <input type="hidden" id="sticker-id">
+                
+                <div id="add-fields-container">
+                    <div class="form-group">
+                        <label>Select Sticker Images</label>
+                        <input type="file" id="sticker-image" class="form-control" multiple accept="image/*">
+                    </div>
+                    <div id="image-preview-container" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 1rem;"></div>
+                </div>
+
+                <div id="edit-fields-container">
+                    <div class="form-group" id="sticker-name-group">
+                        <label>Sticker Name</label>
+                        <input type="text" id="sticker-name" class="form-control">
+                        <small style="color: #666; display: none;" id="bulk-name-hint">Names will be auto-generated from filenames when adding multiple stickers.</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="sticker-category" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="sticker-price" class="form-control">
+                    </div>
+                    <div class="form-group" style="display: none;">
+                        <input type="hidden" id="sticker-image-url">
+                    </div>
+                    <div class="form-group" style="display:none;">
+                        <label>Quantity Remaining</label>
+                        <input type="number" id="sticker-quantity" class="form-control" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Sold Out?</label>
+                        <input type="checkbox" id="sticker-soldout">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary full-width">Save Sticker</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div id="order-modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal" id="close-order-modal">&times;</button>
+            <h3>Order Details</h3>
+            <div id="order-details-content" style="margin-top: 1rem;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Gallery Modal -->
+    <div id="gallery-modal" class="modal hidden">
+        <div class="modal-content" style="max-width: 600px;">
+            <button class="close-modal" id="close-gallery-modal">&times;</button>
+            <h3>Order Images</h3>
+            <div id="gallery-content" style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 1rem;">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>

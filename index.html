@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickGPT - Scratch-Proof & Waterproof Vinyl Stickers</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo"><a href="index.html">StickGPT</a></div>
+        <nav class="nav-links">
+            <a href="catalog.html">Catalog</a>
+            <a href="custom.html">Custom Stickers</a>
+            <a href="seller/index.html" class="login-link">Seller Login</a>
+        </nav>
+        <button id="cart-toggle" class="cart-btn">
+            Cart <span id="cart-count">0</span>
+        </button>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Stick Anywhere, Stay Vibrant.</h1>
+                <p>Scratch-Proof & Waterproof Vinyl Stickers for your laptop, phone, bike, and more.</p>
+                <div class="hero-cta">
+                    <a href="catalog.html" class="btn btn-primary">Browse Stickers</a>
+                    <a href="custom.html" class="btn btn-secondary">Order Custom Sticker</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature">
+                <h3>💧 Waterproof</h3>
+                <p>Durable vinyl that withstands rain and spills.</p>
+            </div>
+            <div class="feature">
+                <h3>🛡️ Scratch-Proof</h3>
+                <p>Tough coating protects against scuffs and fading.</p>
+            </div>
+            <div class="feature">
+                <h3>✨ Vibrant Print</h3>
+                <p>High-quality printing that makes colors pop.</p>
+            </div>
+        </section>
+
+        <section class="gallery-section">
+            <h2 class="text-center" style="margin-bottom: 2rem; color: var(--text-color);">Our Stickers</h2>
+            <div id="masonry-gallery" class="masonry-gallery">
+                <!-- Populated by JS -->
+                <p class="loading text-center" style="width: 100%;">Loading gallery...</p>
+            </div>
+            <div class="text-center mt-2">
+                <a href="catalog.html" class="btn btn-outline">View Full Catalog</a>
+            </div>
+        </section>
+        
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps-grid">
+                <div class="step">1. Browse or Upload Design</div>
+                <div class="step">2. Add to Cart</div>
+                <div class="step">3. Checkout (No payment gateway)</div>
+                <div class="step">4. Order Confirmed via WhatsApp</div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div>
+                <h3>StickGPT</h3>
+                <p>Custom & pre-made vinyl stickers.</p>
+            </div>
+            <div>
+                <h3>Contact (WhatsApp)</h3>
+                <p>+91 7874068891</p>
+                <p>+91 6353303572</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 StickGPT. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer (Hidden by default) -->
+    <div id="cart-drawer" class="cart-drawer">
+        <div class="cart-header">
+            <h2>Your Cart</h2>
+            <button id="close-cart" class="close-btn">&times;</button>
+        </div>
+        <div id="cart-items" class="cart-items">
+            <!-- Items go here -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">Total: ₹<span id="cart-total-price">0</span></div>
+            <a href="checkout.html" class="btn btn-primary full-width">Proceed to Checkout</a>
+        </div>
+    </div>
+    <div id="cart-overlay" class="cart-overlay hidden"></div>
+
+    <script src="js/config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/catalog.js"></script>
+</body>
+</html>
