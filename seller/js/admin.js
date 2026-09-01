@@ -64,6 +64,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    let currentOrders = [];
+
     // Orders Logic
     async function loadOrders() {
         const container = document.getElementById('orders-container');
@@ -71,24 +73,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let orders = mockOrders;
         try {
-            const localOrders = JSON.parse(localStorage.getItem('sticker_orders'));
-            if (Array.isArray(localOrders)) {
-                orders = localOrders.length > 0 ? localOrders : mockOrders;
+            const res = await fetch('/api/orders');
+            if (res.ok) {
+                orders = await res.json();
+            } else {
+                console.error('Failed to fetch orders from MongoDB API');
             }
         } catch (e) {
-            console.error('Failed to parse sticker_orders', e);
+            console.error('Fetch error', e);
         }
-        
-        if (CONFIG.APPS_SCRIPT_URL) {
-            try {
-                const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getOrders`);
-                if (res.ok) {
-                    orders = await res.json();
-                }
-            } catch (e) {
-                console.error('Fetch error, using local data', e);
-            }
-        }
+        currentOrders = orders;
 
         if (orders.length === 0) {
             container.innerHTML = '<div style="text-align: center; padding: 2rem; background: #fff; border-radius: 8px;">No orders found.</div>';
@@ -179,20 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const isChecked = e.target.checked;
             const newStatus = isChecked ? 'Completed' : 'Pending';
             
-            let orders = JSON.parse(localStorage.getItem('sticker_orders')) || mockOrders;
-            const orderIndex = orders.findIndex(o => o.orderId === id);
+            const orderIndex = currentOrders.findIndex(o => o.orderId === id);
             if (orderIndex > -1) {
-                orders[orderIndex].status = newStatus;
-                localStorage.setItem('sticker_orders', JSON.stringify(orders));
+                currentOrders[orderIndex].status = newStatus;
             }
 
-            if (CONFIG.APPS_SCRIPT_URL) {
-                fetch(CONFIG.APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ action: 'updateOrderStatus', orderId: id, status: newStatus })
-                });
-            }
+            fetch('/api/orders', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: id, status: newStatus })
+            }).catch(err => console.error('Failed to update status', err));
             
             // visually update without full re-render
             const label = e.target.closest('label');
@@ -213,8 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.dataset.action === 'delete') {
             if(confirm("Delete this order?")) {
                 console.log(`Delete order ${id}`);
-                // API call to delete
-                loadOrders(); // reload
+                fetch(`/api/orders?id=${id}`, { method: 'DELETE' })
+                    .then(() => loadOrders())
+                    .catch(err => console.error('Failed to delete order', err));
             }
             return;
         }
@@ -223,8 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('view-order-btn') || e.target.classList.contains('view-order-link')) {
             e.preventDefault();
             // find order
-            let orders = JSON.parse(localStorage.getItem('sticker_orders')) || mockOrders;
-            const order = orders.find(o => o.orderId === id);
+            const order = currentOrders.find(o => o.orderId === id);
             if (order) {
                 const detailsHtml = `
                     <p><strong>Customer:</strong> ${order.customerName}</p>
@@ -310,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadStats() {
-        let orders = JSON.parse(localStorage.getItem('sticker_orders')) || mockOrders;
+        let orders = currentOrders;
         
         let completedCount = 0;
         let pendingCount = 0;
@@ -413,11 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (confirm(`Are you sure you want to delete ${checkedBoxes.length} selected sticker(s)?`)) {
             const idsToDelete = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-id'));
             currentCatalog = currentCatalog.filter(s => !idsToDelete.includes(s.id));
-            localStorage.setItem('sticker_catalog', JSON.stringify(currentCatalog));
-            
-            if (CONFIG.APPS_SCRIPT_URL) {
-                // Bulk delete API call not implemented in backend, would need to handle
-            }
+            fetch(`/api/catalog?ids=${idsToDelete.join(',')}`, { method: 'DELETE' }).catch(console.error);
             
             loadCatalog();
             document.getElementById('delete-selected-btn').style.display = 'none';
@@ -441,16 +427,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     currentCatalog[stickerIndex][field] = value;
                 }
                 
-                // Save locally
-                localStorage.setItem('sticker_catalog', JSON.stringify(currentCatalog));
-                
-                if (CONFIG.APPS_SCRIPT_URL) {
-                    fetch(CONFIG.APPS_SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: JSON.stringify({ action: 'saveSticker', ...currentCatalog[stickerIndex] })
-                    });
-                }
+                fetch('/api/catalog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveSticker', ...currentCatalog[stickerIndex] })
+                }).catch(console.error);
             }
         }
     }, true);
@@ -462,22 +443,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stickerIndex > -1) {
                 currentCatalog[stickerIndex].soldOut = e.target.checked;
                 
-                // Save locally
-                localStorage.setItem('sticker_catalog', JSON.stringify(currentCatalog));
-                
-                if (CONFIG.APPS_SCRIPT_URL) {
-                    try {
-                        await fetch(CONFIG.APPS_SCRIPT_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                action: 'updateCatalog',
-                                catalog: currentCatalog
-                            })
-                        });
-                    } catch(err) {
-                        console.error('Failed to sync catalog update', err);
-                    }
-                }
+                fetch('/api/catalog', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'saveSticker', ...currentCatalog[stickerIndex] })
+                }).catch(console.error);
             }
         }
     });
@@ -513,10 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sticker = currentCatalog.find(s => s.id === id);
             if (sticker && confirm(`Are you sure you want to delete "${sticker.name}"?`)) {
                 currentCatalog = currentCatalog.filter(s => s.id !== id);
-                localStorage.setItem('sticker_catalog', JSON.stringify(currentCatalog));
-                if (CONFIG.APPS_SCRIPT_URL) {
-                    // Bulk delete API call not implemented in backend, would need to handle
-                }
+                fetch(`/api/catalog?ids=${id}`, { method: 'DELETE' }).catch(console.error);
                 loadCatalog();
             }
         }
@@ -636,11 +603,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        localStorage.setItem('sticker_catalog', JSON.stringify(currentCatalog));
-        
-        if (CONFIG.APPS_SCRIPT_URL) {
-            // If we have a backend, we might want to sync this differently later
-        }
+        await fetch('/api/catalog', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'updateCatalog', catalog: currentCatalog })
+        }).catch(console.error);
 
         stickerModal.classList.add('hidden');
         loadCatalog();

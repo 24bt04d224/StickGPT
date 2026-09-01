@@ -73,16 +73,14 @@ const store = new StateStore();
 
 // Utility for fetching local or remote data
 async function fetchStickers() {
-    if (CONFIG.APPS_SCRIPT_URL) {
-        try {
-            const res = await fetch(`${CONFIG.APPS_SCRIPT_URL}?action=getStickers`);
-            if (res.ok) {
-                const data = await res.json();
-                return data; // assuming data is array of objects
-            }
-        } catch (e) {
-            console.error("Failed to fetch from Apps Script, falling back to local/mock", e);
+    try {
+        const res = await fetch('/api/catalog');
+        if (res.ok) {
+            const data = await res.json();
+            return data;
         }
+    } catch (e) {
+        console.error("Failed to fetch from MongoDB API, falling back to local/mock", e);
     }
     
     // Fallback/Mock data (until backend is linked)

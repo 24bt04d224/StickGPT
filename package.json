@@ -1,0 +1,24 @@
+{
+  "name": "sticker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/24bt04d224/StickGPT.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/24bt04d224/StickGPT/issues"
+  },
+  "homepage": "https://github.com/24bt04d224/StickGPT#readme",
+  "dependencies": {
+    "mongodb": "^7.6.0"
+  }
+}

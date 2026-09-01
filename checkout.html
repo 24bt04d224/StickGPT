@@ -193,30 +193,16 @@
                     items: store.cart 
                 };
 
-                // Local Fallback for Demo
-                const existingOrders = JSON.parse(localStorage.getItem('sticker_orders')) || [];
-                existingOrders.unshift(payload);
-                try {
-                    localStorage.setItem('sticker_orders', JSON.stringify(existingOrders));
-                } catch(e) {
-                    console.warn("Storage quota exceeded, clearing old orders");
-                    localStorage.setItem('sticker_orders', JSON.stringify([payload]));
-                }
-
-                // Background send to Apps Script to save in Google Sheets
-                if (CONFIG.APPS_SCRIPT_URL) {
-                    try {
-                        // Fire and forget
-                        fetch(CONFIG.APPS_SCRIPT_URL, {
-                            method: 'POST',
-                            mode: 'no-cors', // So it works without CORS issues on simple saves
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-                    } catch(err) {
-                        console.error('Failed to log order to sheets', err);
-                    }
-                }
+                // Send to MongoDB API
+                fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                }).then(res => {
+                    if(!res.ok) console.error('Failed to save order to MongoDB');
+                }).catch(err => {
+                    console.error('Error saving order', err);
+                });
             });
         });
     </script>
