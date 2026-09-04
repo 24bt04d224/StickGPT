@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetBundle = e.target.closest('.order-images-bundle');
         if (targetBundle) {
             const id = targetBundle.getAttribute('data-id');
-            let orders = JSON.parse(localStorage.getItem('sticker_orders')) || mockOrders;
+            let orders = currentOrders;
             const order = orders.find(o => o.orderId === id);
             if (order) {
                 const galleryContent = document.getElementById('gallery-content');
