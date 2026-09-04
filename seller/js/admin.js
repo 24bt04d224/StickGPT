@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <!-- Left: Images Bundle -->
                 <div class="order-images-bundle" data-id="${order.orderId}" style="flex: 0 0 80px; height: 80px; position: relative; cursor: pointer;" title="Click to view all images">
                     ${(order.items || []).slice(0, 3).map((i, idx) => `
-                        <img src="${i.type === 'custom' ? i.imageUrl : '../' + i.imageUrl}" 
+                        <img src="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" 
                              style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; position: absolute; left: ${idx * 10}px; top: ${idx * 10}px; z-index: ${3 - idx}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.src='https://via.placeholder.com/60?text=IMG'">
                     `).join('')}
                     ${(order.items || []).length > 3 ? `<div style="position: absolute; bottom: -5px; right: -5px; background: #222; color: #fff; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; z-index: 4; font-weight: bold;">+${order.items.length - 3}</div>` : ''}
@@ -151,9 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 galleryContent.innerHTML = (order.items || []).map(i => `
                     <div style="display:flex; flex-direction:column; gap:4px; text-align:center;">
                         <div class="img-download-wrapper" style="border-radius:8px; overflow:hidden; border:1px solid #ddd;">
-                            <img src="${i.type === 'custom' ? i.imageUrl : '../' + i.imageUrl}" style="width:100%; aspect-ratio:1; object-fit:cover;">
+                            <img src="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" style="width:100%; aspect-ratio:1; object-fit:cover;">
                             <div class="img-download-overlay">
-                                <a href="${i.type === 'custom' ? i.imageUrl : '../' + i.imageUrl}" download="${i.name.replace(/[^a-z0-9]/gi, '_')}.png" title="Download Image" target="_blank">
+                                <a href="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" download="${i.name.replace(/[^a-z0-9]/gi, '_')}.png" title="Download Image" target="_blank">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 </a>
                             </div>
@@ -231,9 +231,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                     <br><small>Size: ${i.size} | Notes: ${i.notes}</small>
                                 ` : ''}
                                 <div class="img-download-wrapper" style="margin-top: 0.5rem; border-radius:4px; overflow:hidden; border: 1px solid #eee;">
-                                    <img src="${i.type === 'custom' ? i.imageUrl : '../' + i.imageUrl}" style="max-width:100%; max-height:150px;">
+                                    <img src="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" style="max-width:100%; max-height:150px;">
                                     <div class="img-download-overlay">
-                                        <a href="${i.type === 'custom' ? i.imageUrl : '../' + i.imageUrl}" download="${i.name.replace(/[^a-z0-9]/gi, '_')}.png" title="Download Image" target="_blank">
+                                        <a href="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" download="${i.name.replace(/[^a-z0-9]/gi, '_')}.png" title="Download Image" target="_blank">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                         </a>
                                     </div>
