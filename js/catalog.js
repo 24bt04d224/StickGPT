@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Setup filter
         const availabilityFilter = document.getElementById('availability-filter');
         const searchInput = document.getElementById('search-input');
-        const sortSelect = document.getElementById('sort-select');
 
         function applyFilters() {
             let filtered = [...stickers];
@@ -68,19 +67,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 filtered = filtered.filter(s => s.name.toLowerCase().includes(term));
             }
 
-            const sort = sortSelect?.value;
-            if (sort === 'price-asc') {
-                filtered.sort((a, b) => a.price - b.price);
-            } else if (sort === 'price-desc') {
-                filtered.sort((a, b) => b.price - a.price);
-            }
-            
             renderCatalog(filtered);
         }
 
         if (availabilityFilter) availabilityFilter.addEventListener('change', applyFilters);
         if (searchInput) searchInput.addEventListener('input', applyFilters);
-        if (sortSelect) sortSelect.addEventListener('change', applyFilters);
     }
 
     const justAddedIds = new Set();
