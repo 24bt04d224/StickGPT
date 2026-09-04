@@ -262,6 +262,9 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCatalog = [];
         }
         
+        const countSpan = document.getElementById('catalog-count');
+        if (countSpan) countSpan.textContent = `(${currentCatalog.length})`;
+
         tbody.innerHTML = currentCatalog.map(sticker => {
             const imgPath = (sticker.imageUrl || '').startsWith('data:image') ? sticker.imageUrl : `../${sticker.imageUrl}`;
             const safeName = (sticker.name || 'Sticker').replace(/[^a-z0-9]/gi, '_');
