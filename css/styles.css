@@ -300,7 +300,7 @@ h1, h2, h3 {
     display: flex;
     align-items: stretch;
     justify-content: center;
-    gap: 0;
+    gap: 1rem;
     max-width: 960px;
     margin: 0 auto;
     flex-wrap: wrap;
@@ -654,6 +654,10 @@ textarea.form-control {
 }
 
 /* Masonry Gallery */
+.gallery-section {
+    padding: 3rem 2rem;
+    background: var(--background-color);
+}
 .masonry-gallery {
     column-count: 4;
     column-gap: 15px;
