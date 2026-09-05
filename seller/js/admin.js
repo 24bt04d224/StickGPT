@@ -421,15 +421,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (soldOutItems.length === 0) {
             lowStockList.innerHTML = '<li style="color:#555;">No stickers are currently sold out.</li>';
         } else {
-            lowStockList.innerHTML = soldOutItems.map(s => `
+            lowStockList.innerHTML = soldOutItems.map(s => {
+                const imgPath = (s.imageUrl || '').startsWith('data:image') || (s.imageUrl || '').startsWith('http') ? s.imageUrl : '../' + s.imageUrl;
+                return `
                 <li style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:0.5rem 0;">
                     <div style="display:flex; align-items:center; gap: 10px;">
-                        <img src="../${s.imageUrl}" style="width:30px; height:30px; object-fit:contain; background:#f9f9f9;">
+                        <img src="${imgPath}" style="width:30px; height:30px; object-fit:contain; background:#f9f9f9;">
                         <strong>${s.name}</strong>
                     </div>
                     <span style="color:#c62828; font-weight:bold; background:#ffebee; padding:4px 8px; border-radius:12px; font-size:0.8rem;">Sold Out</span>
                 </li>
-            `).join('');
+            `;}).join('');
         }
     }
     
