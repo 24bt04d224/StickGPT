@@ -21,6 +21,7 @@
             </div>
             <nav class="sidebar-nav">
                 <button id="nav-orders" class="active">Orders Dashboard</button>
+                <button id="nav-completed-orders">Completed Orders</button>
                 <button id="nav-catalog">Manage Catalog</button>
                 <button id="nav-stats">Stats & Analytics</button>
                 <button id="nav-logout" style="margin-top: auto;">Logout</button>
@@ -37,6 +38,18 @@
                 
                 <div id="orders-container" style="display: flex; flex-direction: column; gap: 1rem;">
                     <!-- Loading state -->
+                    <div style="text-align: center; padding: 2rem;">Loading orders...</div>
+                </div>
+            </div>
+
+            <!-- Completed Orders View -->
+            <div id="view-completed-orders" class="hidden">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>Completed Orders</h2>
+                    <button id="refresh-completed-orders" class="btn btn-outline">Refresh Data</button>
+                </div>
+                
+                <div id="completed-orders-container" style="display: flex; flex-direction: column; gap: 1rem;">
                     <div style="text-align: center; padding: 2rem;">Loading orders...</div>
                 </div>
             </div>

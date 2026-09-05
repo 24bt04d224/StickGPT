@@ -3,30 +3,48 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Navigation
     const navOrders = document.getElementById('nav-orders');
+    const navCompletedOrders = document.getElementById('nav-completed-orders');
     const navCatalog = document.getElementById('nav-catalog');
     const navStats = document.getElementById('nav-stats');
     const navLogout = document.getElementById('nav-logout');
     
     const viewOrders = document.getElementById('view-orders');
+    const viewCompletedOrders = document.getElementById('view-completed-orders');
     const viewCatalog = document.getElementById('view-catalog');
     const viewStats = document.getElementById('view-stats');
 
     navOrders.addEventListener('click', () => {
         navOrders.classList.add('active');
+        navCompletedOrders.classList.remove('active');
         navCatalog.classList.remove('active');
         navStats.classList.remove('active');
         viewOrders.classList.remove('hidden');
+        viewCompletedOrders.classList.add('hidden');
         viewCatalog.classList.add('hidden');
         viewStats.classList.add('hidden');
         loadOrders();
     });
 
+    navCompletedOrders.addEventListener('click', () => {
+        navCompletedOrders.classList.add('active');
+        navOrders.classList.remove('active');
+        navCatalog.classList.remove('active');
+        navStats.classList.remove('active');
+        viewCompletedOrders.classList.remove('hidden');
+        viewOrders.classList.add('hidden');
+        viewCatalog.classList.add('hidden');
+        viewStats.classList.add('hidden');
+        loadCompletedOrders();
+    });
+
     navCatalog.addEventListener('click', () => {
         navCatalog.classList.add('active');
         navOrders.classList.remove('active');
+        navCompletedOrders.classList.remove('active');
         navStats.classList.remove('active');
         viewCatalog.classList.remove('hidden');
         viewOrders.classList.add('hidden');
+        viewCompletedOrders.classList.add('hidden');
         viewStats.classList.add('hidden');
         loadCatalog();
     });
@@ -34,9 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     navStats.addEventListener('click', () => {
         navStats.classList.add('active');
         navOrders.classList.remove('active');
+        navCompletedOrders.classList.remove('active');
         navCatalog.classList.remove('active');
         viewStats.classList.remove('hidden');
         viewOrders.classList.add('hidden');
+        viewCompletedOrders.classList.add('hidden');
         viewCatalog.classList.add('hidden');
         loadStats();
     });
@@ -84,12 +104,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         currentOrders = orders;
 
-        if (orders.length === 0) {
-            container.innerHTML = '<div style="text-align: center; padding: 2rem; background: #fff; border-radius: 8px;">No orders found.</div>';
+        const pendingOrders = orders.filter(o => o.status !== 'Completed');
+
+        if (pendingOrders.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; background: #fff; border-radius: 8px;">No pending orders found.</div>';
             return;
         }
 
-        container.innerHTML = orders.map(order => `
+        container.innerHTML = pendingOrders.map(order => `
             <div class="order-card" style="display: flex; background: #fff; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); padding: 1rem 1.5rem; gap: 2rem; align-items: center; transition: transform 0.2s;">
                 
                 <!-- Left: Images Bundle -->
@@ -98,22 +120,87 @@ document.addEventListener('DOMContentLoaded', () => {
                         <img src="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" 
                              style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; position: absolute; left: ${idx * 10}px; top: ${idx * 10}px; z-index: ${3 - idx}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.src='https://via.placeholder.com/60?text=IMG'">
                     `).join('')}
-                    ${(order.items || []).length > 3 ? `<div style="position: absolute; bottom: -5px; right: -5px; background: #222; color: #fff; font-size: 0.75rem; padding: 2px 6px; border-radius: 10px; z-index: 4; font-weight: bold;">+${order.items.length - 3}</div>` : ''}
+                    ${order.items && order.items.length > 3 ? `<div style="position: absolute; right: 0; bottom: 0; background: rgba(0,0,0,0.6); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; z-index: 4;">+${order.items.length - 3}</div>` : ''}
                 </div>
 
-                <!-- Middle: Details (Tabular) -->
-                <div style="flex: 1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; align-items: center;">
+                <!-- Middle: Details -->
+                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: center;">
                     <div>
-                        <strong style="font-size: 1.05rem; color: #333; display: block; margin-bottom: 2px;">${order.orderId}</strong>
-                        <span style="color: #777; font-size: 0.85rem;">${new Date(order.timestamp).toLocaleDateString()}</span>
+                        <strong style="color:#222; display: block; margin-bottom: 2px;">${order.orderId}</strong>
+                        <span style="color: #888; font-size: 0.85rem;">${new Date(order.timestamp).toLocaleDateString()}</span>
                     </div>
                     <div>
                         <strong style="color:#222; display: block; margin-bottom: 2px;">${order.customerName}</strong>
                         <span style="color: #555; font-size: 0.85rem;">${order.phone}</span>
                     </div>
                     <div>
-                        <span style="color: #555; display: block; margin-bottom: 2px;">Items: <strong>${(order.items || []).length}</strong></span>
-                        <span style="color: #555;">Total: <strong style="color: #e53935; font-size: 1.1rem;">₹${order.totalAmount}</strong></span>
+                        <span style="color: #555; font-size: 0.9rem; display: block;">Items: <strong style="color:#222;">${(order.items || []).reduce((sum, item) => sum + (item.qty || 1), 0)}</strong></span>
+                        <span style="color: #555; font-size: 0.9rem;">Total: <strong style="color:#e65100;">₹${order.totalAmount}</strong></span>
+                    </div>
+                </div>
+
+                <!-- Right: Actions (Vertical) -->
+                <div style="flex: 0 0 120px; display: flex; flex-direction: column; gap: 8px;">
+                    <label style="cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 6px; padding: 6px; border-radius: 6px; background: ${order.status === 'Completed' ? '#e8f5e9' : '#fff3e0'}; color: ${order.status === 'Completed' ? '#2e7d32' : '#e65100'}; border: 1px solid ${order.status === 'Completed' ? '#81c784' : '#ffb74d'}; transition: all 0.2s; user-select: none;">
+                        <input type="checkbox" class="status-checkbox" data-id="${order.orderId}" ${order.status === 'Completed' ? 'checked' : ''} style="accent-color: #2e7d32; cursor: pointer; width:16px; height:16px;">
+                        <span class="status-text" style="font-weight: 600; font-size: 0.9rem;">${order.status === 'Completed' ? 'Completed' : 'Pending'}</span>
+                    </label>
+                    <button class="btn btn-outline view-order-btn" style="padding: 6px; font-size: 0.85rem;" data-id="${order.orderId}">View Details</button>
+                    <button class="btn view-order-link" style="color:#d32f2f; border:1px solid #ef9a9a; background:#ffebee; padding: 6px; font-size: 0.85rem; border-radius: 6px;" data-action="delete" data-id="${order.orderId}">Delete Order</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function loadCompletedOrders() {
+        const container = document.getElementById('completed-orders-container');
+        container.innerHTML = '<div style="text-align: center; padding: 2rem;">Loading completed orders...</div>';
+
+        let orders = mockOrders;
+        try {
+            const res = await fetch('/api/orders');
+            if (res.ok) {
+                orders = await res.json();
+            } else {
+                console.error('Failed to fetch orders from MongoDB API');
+            }
+        } catch (e) {
+            console.error('Fetch error', e);
+        }
+        currentOrders = orders;
+
+        const completedOrders = orders.filter(o => o.status === 'Completed');
+
+        if (completedOrders.length === 0) {
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; background: #fff; border-radius: 8px;">No completed orders found.</div>';
+            return;
+        }
+
+        container.innerHTML = completedOrders.map(order => `
+            <div class="order-card" style="display: flex; background: #fff; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 6px rgba(0,0,0,0.02); padding: 1rem 1.5rem; gap: 2rem; align-items: center; transition: transform 0.2s;">
+                
+                <!-- Left: Images Bundle -->
+                <div class="order-images-bundle" data-id="${order.orderId}" style="flex: 0 0 80px; height: 80px; position: relative; cursor: pointer;" title="Click to view all images">
+                    ${(order.items || []).slice(0, 3).map((i, idx) => `
+                        <img src="${(i.imageUrl || '').startsWith('data:image') || (i.imageUrl || '').startsWith('http') ? i.imageUrl : '../' + i.imageUrl}" 
+                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; position: absolute; left: ${idx * 10}px; top: ${idx * 10}px; z-index: ${3 - idx}; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onerror="this.src='https://via.placeholder.com/60?text=IMG'">
+                    `).join('')}
+                    ${order.items && order.items.length > 3 ? `<div style="position: absolute; right: 0; bottom: 0; background: rgba(0,0,0,0.6); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; z-index: 4;">+${order.items.length - 3}</div>` : ''}
+                </div>
+
+                <!-- Middle: Details -->
+                <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; align-items: center;">
+                    <div>
+                        <strong style="color:#222; display: block; margin-bottom: 2px;">${order.orderId}</strong>
+                        <span style="color: #888; font-size: 0.85rem;">${new Date(order.timestamp).toLocaleDateString()}</span>
+                    </div>
+                    <div>
+                        <strong style="color:#222; display: block; margin-bottom: 2px;">${order.customerName}</strong>
+                        <span style="color: #555; font-size: 0.85rem;">${order.phone}</span>
+                    </div>
+                    <div>
+                        <span style="color: #555; font-size: 0.9rem; display: block;">Items: <strong style="color:#222;">${(order.items || []).reduce((sum, item) => sum + (item.qty || 1), 0)}</strong></span>
+                        <span style="color: #555; font-size: 0.9rem;">Total: <strong style="color:#e65100;">₹${order.totalAmount}</strong></span>
                     </div>
                 </div>
 
@@ -131,6 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.getElementById('refresh-orders').addEventListener('click', loadOrders);
+    document.getElementById('refresh-completed-orders').addEventListener('click', loadCompletedOrders);
 
     // View Order Details
     const orderModal = document.getElementById('order-modal');
@@ -140,7 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleryModal = document.getElementById('gallery-modal');
     document.getElementById('close-gallery-modal').addEventListener('click', () => galleryModal.classList.add('hidden'));
 
-    document.getElementById('orders-container').addEventListener('click', async (e) => {
+    document.getElementById('orders-container').addEventListener('click', handleOrderClick);
+    document.getElementById('completed-orders-container').addEventListener('click', handleOrderClick);
+
+    async function handleOrderClick(e) {
         const targetBundle = e.target.closest('.order-images-bundle');
         if (targetBundle) {
             const id = targetBundle.getAttribute('data-id');
@@ -204,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(confirm("Delete this order?")) {
                 console.log(`Delete order ${id}`);
                 fetch(`/api/orders?id=${id}`, { method: 'DELETE' })
-                    .then(() => loadOrders())
+                    .then(() => { loadOrders(); loadCompletedOrders(); })
                     .catch(err => console.error('Failed to delete order', err));
             }
             return;
@@ -247,7 +338,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 orderModal.classList.remove('hidden');
             }
         }
-    });
+    }
 
     // Catalog Logic
     let currentCatalog = [];
