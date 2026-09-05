@@ -12,16 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let generatedWaMessage = "";
 
     const waBtn1 = document.getElementById('btn-wa-1');
-    const waBtn2 = document.getElementById('btn-wa-2');
-
     if (waBtn1) waBtn1.addEventListener('click', () => {
         const encodedMessage = encodeURIComponent(generatedWaMessage);
-        const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[0]}?text=${encodedMessage}`;
-        window.location.href = waUrl;
-    });
-    if (waBtn2) waBtn2.addEventListener('click', () => {
-        const encodedMessage = encodeURIComponent(generatedWaMessage);
-        const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[1]}?text=${encodedMessage}`;
+        const waUrl = `https://wa.me/916353303572?text=${encodedMessage}`;
         window.location.href = waUrl;
     });
 
@@ -166,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('cust-name').value;
             const phone = document.getElementById('cust-phone').value;
             const email = document.getElementById('cust-email').value;
+            const instRadio = document.querySelector('input[name="cust-institution"]:checked');
+            const institution = instRadio ? instRadio.value : 'Not specified';
             const notes = document.getElementById('cust-notes').value;
 
             const orderId = 'ORD-C-' + Date.now();
@@ -175,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let message = `*NEW CUSTOM STICKER ORDER*\n\n`;
             message += `Name: ${name}\n`;
             message += `Phone: ${phone}\n`;
+            message += `Institution: ${institution}\n`;
             if(email) message += `Email: ${email}\n`;
             message += `\n`;
             
@@ -207,6 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 customerName: name,
                 phone,
                 email,
+                institution,
                 notes,
                 totalAmount,
                 items: payloadItems // Base64 data included

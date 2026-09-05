@@ -53,14 +53,30 @@
                             <textarea id="cust-notes" class="form-control" rows="2"></textarea>
                         </div>
                         
+                        <div class="form-group">
+                            <label>Institution/Category *</label>
+                            <div class="institution-options" style="display: flex; gap: 1rem;">
+                                <label class="inst-btn" style="flex:1; text-align:center; margin-bottom:0;">
+                                    <input type="radio" name="cust-institution" value="NUV" required style="opacity: 0; position: absolute; width: 0; height: 0;">
+                                    <div class="inst-btn-inner">NUV</div>
+                                </label>
+                                <label class="inst-btn" style="flex:1; text-align:center; margin-bottom:0;">
+                                    <input type="radio" name="cust-institution" value="GSFCU" style="opacity: 0; position: absolute; width: 0; height: 0;">
+                                    <div class="inst-btn-inner">GSFCU</div>
+                                </label>
+                                <label class="inst-btn" style="flex:1; text-align:center; margin-bottom:0;">
+                                    <input type="radio" name="cust-institution" value="Other" style="opacity: 0; position: absolute; width: 0; height: 0;">
+                                    <div class="inst-btn-inner">Other</div>
+                                </label>
+                            </div>
+                        </div>
+                        
                         <div style="margin-top: 2rem;">
                             <button type="submit" id="btn-confirm" class="btn btn-primary full-width" style="margin-bottom: 1rem; background-color: #2ecc71; color: white;">Confirm Order</button>
                             
                             <div id="wa-buttons-container" class="hidden">
-                                <h4>Choose WhatsApp Number to send order:</h4>
                                 <div style="display:flex; gap:1rem; margin-top: 1rem;">
-                                    <button type="button" id="btn-wa-1" class="btn btn-primary full-width">Send to +91 7874068891</button>
-                                    <button type="button" id="btn-wa-2" class="btn btn-secondary full-width">Send to +91 6353303572</button>
+                                    <button type="button" id="btn-wa-1" class="btn btn-primary full-width">SUBMIT</button>
                                 </div>
                             </div>
                         </div>
@@ -78,7 +94,6 @@
             </div>
             <div>
                 <h3>Contact (WhatsApp)</h3>
-                <p>+91 7874068891</p>
                 <p>+91 6353303572</p>
             </div>
         </div>
@@ -102,13 +117,7 @@
 
             document.getElementById('btn-wa-1').addEventListener('click', () => {
                 const encodedMessage = encodeURIComponent(generatedWaMessage);
-                const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[0]}?text=${encodedMessage}`;
-                store.clearCart();
-                window.location.href = waUrl;
-            });
-            document.getElementById('btn-wa-2').addEventListener('click', () => {
-                const encodedMessage = encodeURIComponent(generatedWaMessage);
-                const waUrl = `https://wa.me/${CONFIG.WHATSAPP_NUMBERS[1]}?text=${encodedMessage}`;
+                const waUrl = `https://wa.me/916353303572?text=${encodedMessage}`;
                 store.clearCart();
                 window.location.href = waUrl;
             });
@@ -118,7 +127,6 @@
                 if (cart.length === 0) {
                     checkoutItems.innerHTML = '<p>Cart is empty. Please add items to cart first.</p>';
                     document.getElementById('btn-wa-1').disabled = true;
-                    document.getElementById('btn-wa-2').disabled = true;
                 } else {
                     checkoutItems.innerHTML = cart.map(item => `
                         <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem; border-bottom:1px solid #eee; padding-bottom:0.5rem;">
@@ -150,6 +158,8 @@
                 const name = document.getElementById('cust-name').value;
                 const phone = document.getElementById('cust-phone').value;
                 const email = document.getElementById('cust-email').value;
+                const instRadio = document.querySelector('input[name="cust-institution"]:checked');
+                const institution = instRadio ? instRadio.value : 'Not specified';
 
                 const notes = document.getElementById('cust-notes').value;
 
@@ -160,6 +170,7 @@
                 let message = `*NEW STICKER ORDER*\n\n`;
                 message += `Name: ${name}\n`;
                 message += `Phone: ${phone}\n`;
+                message += `Institution: ${institution}\n`;
                 if(email) message += `Email: ${email}\n`;
                 message += `\n`;
                 
@@ -188,6 +199,7 @@
                     customerName: name,
                     phone,
                     email,
+                    institution,
                     notes,
                     totalAmount,
                     items: store.cart 

@@ -15,8 +15,14 @@
             <a href="custom.html">Custom Stickers</a>
             <a href="seller/index.html" class="login-link">Seller Login</a>
         </nav>
-        <button id="cart-toggle" class="cart-btn">
-            Cart <span id="cart-count">0</span>
+        <button id="cart-toggle" class="cart-btn" aria-label="Shopping Cart">
+            <svg class="cart-trolley-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="21" r="1"></circle>
+                <circle cx="20" cy="21" r="1"></circle>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span class="cart-label">Cart</span>
+            <span id="cart-count">0</span>
         </button>
     </header>
 
@@ -60,29 +66,61 @@
         
         <section class="how-it-works">
             <h2>How It Works</h2>
+            <p class="hiw-subtitle">From design to doorstep in 4 simple steps</p>
             <div class="steps-grid">
-                <div class="step">1. Browse or Upload Design</div>
-                <div class="step">2. Add to Cart</div>
-                <div class="step">3. Checkout (No payment gateway)</div>
-                <div class="step">4. Order Confirmed via WhatsApp</div>
+                <div class="step">
+                    <div class="step-icon">🎨</div>
+                    <div class="step-number">01</div>
+                    <h3>Browse or Upload</h3>
+                    <p>Pick from our catalog or upload your own custom design.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-icon">🛒</div>
+                    <div class="step-number">02</div>
+                    <h3>Add to Cart</h3>
+                    <p>Choose your quantity and add stickers to your cart.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-icon">📋</div>
+                    <div class="step-number">03</div>
+                    <h3>Place Order</h3>
+                    <p>Fill in your details — no payment gateway needed.</p>
+                </div>
+                <div class="step-arrow">→</div>
+                <div class="step">
+                    <div class="step-icon">💬</div>
+                    <div class="step-number">04</div>
+                    <h3>WhatsApp Confirm</h3>
+                    <p>Get instant confirmation and updates on WhatsApp.</p>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
+        <div class="footer-accent"></div>
         <div class="footer-content">
-            <div>
-                <h3>StickGPT</h3>
-                <p>Custom & pre-made vinyl stickers.</p>
+            <div class="footer-brand">
+                <h3>Stick<span style="color: var(--primary-color);">GPT</span></h3>
+                <p>Premium scratch-proof & waterproof vinyl stickers for every surface. Made with love in India 🇮🇳</p>
             </div>
-            <div>
-                <h3>Contact (WhatsApp)</h3>
-                <p>+91 7874068891</p>
-                <p>+91 6353303572</p>
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <a href="catalog.html">📦 Full Catalog</a>
+                <a href="custom.html">🎨 Custom Stickers</a>
+                <a href="seller/index.html">🔐 Seller Login</a>
+            </div>
+            <div class="footer-contact">
+                <h4>Chat with Us</h4>
+                <a href="https://wa.me/916353303572" class="whatsapp-link" target="_blank">
+                    <span class="wa-icon">💬</span> +91 63533 03572
+                </a>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 StickGPT. All rights reserved.</p>
+            <p>&copy; 2026 StickGPT. All rights reserved. &nbsp;|&nbsp; Stick Anywhere, Stay Vibrant ✨</p>
         </div>
     </footer>
 
